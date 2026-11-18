@@ -29,6 +29,7 @@ public class AlignedFixedWindowRateLimiter implements RateLimiter{
                 newState.setWindowStartTime(window);
                 newState.setRemainingRequests(u.getTier().getMaxRequests() - 1);
                 allowed.set(true);
+                return newState;
             }
             if(currentState.getRemainingRequests() <= 0) {
                 return currentState;

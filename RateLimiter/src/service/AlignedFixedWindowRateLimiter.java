@@ -20,7 +20,10 @@ public class AlignedFixedWindowRateLimiter implements RateLimiter{
     public boolean allowRequest(long userId) {
         AtomicBoolean allowed = new AtomicBoolean();
         User u = userRepo.getUseraById(userId);
-        long WindowDurationMillis = 10_000L;
+        if(u == null){
+            throw new RuntimeException("User not found");
+        }
+        long WindowDurationMillis = u.getTier().getWindowDuration().toMillis();
         long currentTime = System.currentTimeMillis();
         long window = (currentTime / WindowDurationMillis) * WindowDurationMillis;
         state.compute(userId,(id,currentState) -> {

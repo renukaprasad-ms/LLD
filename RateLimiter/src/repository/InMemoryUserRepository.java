@@ -10,4 +10,8 @@ public class InMemoryUserRepository {
     public User getUseraById(long id) {
         return users.get(id);
     }
+    public User addUser(User user) {
+        users.put(user.getId(), user);
+        return user;
+    }
 }

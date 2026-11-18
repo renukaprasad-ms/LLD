@@ -1,15 +1,50 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import enums.TierType;
+import model.Tier;
+import model.User;
+import repository.InMemoryUserRepository;
+import service.AlignedFixedWindowRateLimiter;
+import service.RateLimiter;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+import java.time.Duration;
+
+public class Main {
+
+    private static final  InMemoryUserRepository userRepo = new InMemoryUserRepository() ;
+    private static final RateLimiter rateLimiter = new AlignedFixedWindowRateLimiter(userRepo);
+
+    public static void main(String[] args) {
+        addInitialData();
+
+        for(int i = 0; i < 20; i++) {
+            boolean allowed = rateLimiter.allowRequest(1);
+            System.out.println("request" + i + allowed);
         }
+
+    }
+
+    public static void addInitialData() {
+        long id = 1;
+        Tier t1 = new Tier();
+        t1.setId(id++);
+        t1.setTier(TierType.FREE);
+        t1.setMaxRequests(10);
+        t1.setWindowDuration(Duration.ofSeconds(10));
+
+        Tier t2 = new Tier();
+        t2.setId(id++);
+        t2.setTier(TierType.PREMIUM);
+        t2.setMaxRequests(20);
+        t2.setWindowDuration(Duration.ofSeconds(10));
+
+        User u1 = new User();
+        u1.setId(id++);
+        u1.setTier(t1);
+
+        User u2 = new User();
+        u2.setId(id++);
+        u2.setTier(t2);
+
+        userRepo.addUser(u1);
+        userRepo.addUser(u2);
     }
 }

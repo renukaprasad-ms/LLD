@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AlignedFixedWindowRateLimiter implements RateLimiter{
 
-    AlignedFixedWindowRateLimiter(InMemoryUserRepository userRepo) {
+    public AlignedFixedWindowRateLimiter(InMemoryUserRepository userRepo) {
         this.userRepo = userRepo;
     }
 
@@ -24,7 +24,7 @@ public class AlignedFixedWindowRateLimiter implements RateLimiter{
         long currentTime = System.currentTimeMillis();
         long window = (currentTime / WindowDurationMillis) * WindowDurationMillis;
         state.compute(userId,(id,currentState) -> {
-            if(currentState == null || currentState.getWindowStartTime() == window) {
+            if(currentState == null || currentState.getWindowStartTime() != window) {
                 RateLimitState newState = new RateLimitState();
                 newState.setWindowStartTime(window);
                 newState.setRemainingRequests(u.getTier().getMaxRequests() - 1);
